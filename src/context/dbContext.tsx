@@ -3,7 +3,7 @@ import { getFirestore, collection, query, limit, type DocumentData, type Firesto
 import { useFirebase } from './firebaseContext'
 
 interface Data {
-  getCollection: (collectionName: string) => Promise<DocumentData[] | []>
+  getCollection: (collectionName: string, queryLimit: number) => Promise<DocumentData[] | []>
 }
 
 const DbContext = createContext({
@@ -19,10 +19,10 @@ export function DbProvider({ children }: { children: React.ReactNode }) {
     setDb(getFirestore())
   }, [app])
 
-  async function getCollection(collectionName: string) {
+  async function getCollection(collectionName: string, queryLimit: number) {
     if (!db) return []
     const coll = collection(db, collectionName)
-    const q = query(coll, limit(10))
+    const q = query(coll, limit(queryLimit))
     const querySnapshot = await getDocs(q)
     const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     return data
